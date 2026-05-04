@@ -1,0 +1,5 @@
+# HOLDOUT SCENARIOS — DEV-AGENTEN LESER ALDRI DISSE
+# Train/test-separasjon: agenten som implementerer koden
+# kan ikke se fasiten den evalueres mot.
+# Kun eval-agenten (.claude/skills/eval/SKILL.md) bruker dette innholdet.
+scenarios/
