@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/opt/homebrew/bin/python3.13
 """
 DSF Agent Monitor — floating GUI window, always on top.
 Usage: python3 .claude/hooks/agent-watch-gui.py [path/to/agent.log]
