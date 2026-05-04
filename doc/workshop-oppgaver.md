@@ -73,7 +73,6 @@ One complete DSF cycle has been run and documented. This is the reference for wh
 Paste this prompt directly into Claude:
 
 ```
-Read CLAUDE.md.
 New compliance rule: currency_restriction.
 
 Rule: Only NOK, EUR, USD, and GBP are permitted currencies.
@@ -81,9 +80,6 @@ Transactions in other currencies are rejected.
 RuleName: currency_restriction
 ScreeningStatus on match: Rejected
 Severity: High
-
-Start with architect agent, create plan in doc/currency-restriction-plan.md.
-Implement phase by phase per the protocol in CLAUDE.md.
 ```
 
 **Watch for:**
@@ -100,7 +96,6 @@ Implement phase by phase per the protocol in CLAUDE.md.
 ### Task 1B: Duplicate Transaction Check (alternative)
 
 ```
-Read CLAUDE.md.
 New compliance rule: duplicate_transaction.
 
 Rule: The same TransactionId cannot be screened more than once
@@ -108,9 +103,6 @@ within 24 hours. Duplicates are rejected with Rejected.
 RuleName: duplicate_transaction
 ScreeningStatus on match: Rejected
 Severity: High
-
-Start with architect agent, create plan in doc/duplicate-transaction-plan.md.
-Implement phase by phase per the protocol in CLAUDE.md.
 ```
 
 ---
@@ -130,13 +122,9 @@ You decide the details — but the prompt MUST specify:
 Starting point:
 
 ```
-Read CLAUDE.md.
 New compliance rule: geo_risk_flag.
 
 [Fill in the rule logic yourself — be as precise as possible]
-
-Start with architect agent, create plan in doc/geo-risk-plan.md.
-Implement phase by phase per the protocol in CLAUDE.md.
 ```
 
 > **Tip:** Start vague on purpose for one run, see what the agent guesses. Run again with a precise spec. Compare the results.
@@ -148,7 +136,6 @@ Implement phase by phase per the protocol in CLAUDE.md.
 Transactions with "suspiciously round" amounts are a well-known AML pattern.
 
 ```
-Read CLAUDE.md.
 New compliance rule: round_amount_flag.
 
 Rule: Transactions where the amount (in NOK) is exactly divisible by
@@ -158,9 +145,6 @@ Examples: 50,000, 100,000, 200,000 → flagged.
 RuleName: round_amount_flag
 ScreeningStatus on match: Flagged
 Severity: Medium
-
-Start with architect agent, create plan in doc/round-amount-plan.md.
-Implement phase by phase per the protocol in CLAUDE.md.
 ```
 
 ---
