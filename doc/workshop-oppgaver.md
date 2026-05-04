@@ -86,6 +86,7 @@ Severity: High
 - Which phases does the architect agent create?
 - Which edge cases does the dev agent write tests for?
 - What does the review agent find?
+- Which artifacts get created — `doc/currency-restriction-plan.md` (architect), `scenarios/` entry (orchestrator, written before implementation), `doc/currency-restriction-analysis.md` (auto after final phase). These are the paper trail of the factory run.
 
 **Discussion questions after run:**
 - Did you need to correct the agent along the way?
