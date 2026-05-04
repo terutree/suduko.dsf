@@ -20,6 +20,20 @@ claude --dangerously-skip-permissions
 tail -f .claude/logs/agent.log
 ```
 
+**Optional: Live agent monitor**
+
+Text-based (terminal):
+```bash
+while true; do clear; bash .claude/hooks/agent-watch.sh; sleep 1; done
+```
+
+GUI (floating window, always on top — recommended during demo):
+```bash
+python3 .claude/hooks/agent-watch-gui.py
+```
+
+Shows active agents with elapsed time and last completed agents. Updates every second.
+
 ---
 
 ## What the Factory Has Already Built
