@@ -84,7 +84,9 @@ F1 has no dependencies. F2 depends on F1. F3 depends on F2. F4 depends on F3.
 
 ### F1: Domain Models and Interfaces
 
-**QC-status:** NOT STARTED
+**QC-status:** APPROVED
+**Review:** APPROVED — all 11 checklist items pass. No findings requiring action.
+**Test:** PASS — build 0 errors/0 warnings, placeholder test green.
 
 **Delivers:** All C# types, enums, interfaces. No logic — only contracts and domain model.
 
@@ -116,7 +118,9 @@ F1 has no dependencies. F2 depends on F1. F3 depends on F2. F4 depends on F3.
 
 ### F2: Compliance Rules and Pipeline
 
-**QC-status:** NOT STARTED
+**QC-status:** APPROVED
+**Review:** APPROVED — 15/15 checklist items pass. Minor: sender-country not screened (out of spec, receiver-only per domain rules). No blocking findings.
+**Test:** PASS — 23/23 green. All boundary values covered. Rejected-not-increment test present.
 
 **Delivers:** All 4 rules, pipeline orchestration, in-memory store implementations, unit tests.
 
@@ -163,7 +167,9 @@ Pipeline status priority: `Rejected > PendingReview > Flagged > Approved`
 
 ### F3: API Layer and Middleware
 
-**QC-status:** NOT STARTED
+**QC-status:** APPROVED
+**Review:** APPROVED — 16/16 checklist items pass. Minor: exception handler excluded from Development (intentional), redundant null cast, no cumulative limit integration test (covered in Core.Tests). No blockers.
+**Test:** PASS — 36/36 green. All 10 named tests present and passing.
 
 **Delivers:** Minimal API endpoints, X-Request-Id middleware, DI wiring, integration tests.
 
@@ -190,7 +196,9 @@ Pipeline status priority: `Rejected > PendingReview > Flagged > Approved`
 
 ### F4: Dockerfile and GitHub Actions
 
-**QC-status:** NOT STARTED
+**QC-status:** APPROVED
+**Review:** APPROVED — all 18 checks pass. Minor: publish path verbose, build-stage comment absent. No blockers.
+**Test:** PASS — 36/36 green, Dockerfile stages verified, CI yml valid, upload-artifact step present.
 
 **Delivers:** Multi-stage Dockerfile with `test` target, GitHub Actions workflow (build + test + format).
 

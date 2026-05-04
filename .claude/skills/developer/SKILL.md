@@ -45,6 +45,7 @@ Review and test agents are run in parallel by the orchestrator BEFORE the next p
 ## Checklist: C# / .NET
 
 - [ ] **Nullable reference types**: `#nullable enable` or enabled in .csproj — no `!` assertions without justification
+- [ ] **Target framework**: NEVER upgrade `<TargetFramework>` to match the local SDK version. If the project targets `net8.0` and the machine has .NET 10, add `runtimeconfig.template.json` with `{ "configProperties": { "System.GC.HeapHardLimit": ... } }` or set `rollForward: Major` — do not change the csproj.
 - [ ] **Records for DTOs**: use `record` for ScreeningRequest, ScreeningResponse, RuleResult — never classes with only get/set
 - [ ] **Amounts as `long`**: NEVER `decimal` or `double` for amounts — everything in cents/øre
 - [ ] **`IScreeningRule` respected**: new rule implements interface, registered in DI, does not change pipeline
@@ -83,6 +84,7 @@ Review and test agents are run in parallel by the orchestrator BEFORE the next p
 ## Checklist: ASP.NET Core
 
 - [ ] **Schema validation on all POST endpoints**: use built-in validation attributes or FluentValidation
+- [ ] **Null-guard composite request types**: records do NOT enforce non-null on binding. Before calling any service/pipeline, explicitly check `request.Sender is null`, `request.Receiver is null`, `string.IsNullOrWhiteSpace(request.Currency)` etc. and return `Results.BadRequest(...)`. A null composite type that reaches domain logic causes a 500, not a 400.
 - [ ] **Global exception handler**: all unexpected exceptions are caught and return a generic 500 response
 - [ ] **Health endpoint**: `GET /health` returns `{"status":"ok"}` without auth
 - [ ] **No sensitive data in responses**: never passwords, internal IDs, or config values
@@ -95,6 +97,7 @@ Review and test agents are run in parallel by the orchestrator BEFORE the next p
 - [ ] **`dotnet build --no-restore` after restore**: no double restores
 - [ ] **Test output**: `--logger "trx;LogFileName=results.trx"` for machine-readable report
 - [ ] **Branch protection**: CI blocks merge on failure
+- [ ] **Upload test artifacts**: after `dotnet test`, add `actions/upload-artifact@v4` with `if: always()` and `path: **/*.trx` — test evidence must be persisted for DORA audit trail. Name the artifact `test-results`.
 
 ## Quality Requirements
 
