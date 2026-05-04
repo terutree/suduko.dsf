@@ -106,6 +106,12 @@ ScreeningStatus on match: Rejected
 Severity: High
 ```
 
+**Watch for:**
+- Which phases does the architect agent create?
+- Which edge cases does the dev agent write tests for?
+- What does the review agent find?
+- Which artifacts get created — `doc/duplicate-transaction-plan.md` (architect), `scenarios/` entry (orchestrator), `doc/duplicate-transaction-analysis.md` (auto after final phase).
+
 ---
 
 ## Track 2: Extended — "I specify, AI delivers" (~55 min)
@@ -128,6 +134,10 @@ New compliance rule: geo_risk_flag.
 [Fill in the rule logic yourself — be as precise as possible]
 ```
 
+**Watch for:**
+- How does the architect interpret an underspecified rule? Where does it fill in gaps?
+- Which artifacts get created — `doc/geo-risk-plan.md` (architect), `scenarios/` entry (orchestrator), `doc/geo-risk-analysis.md` (auto after final phase).
+
 > **Tip:** Start vague on purpose for one run, see what the agent guesses. Run again with a precise spec. Compare the results.
 
 ---
@@ -148,6 +158,10 @@ ScreeningStatus on match: Flagged
 Severity: Medium
 ```
 
+**Watch for:**
+- How does the agent handle the modulo logic in tests — boundary values at exactly 10,000 multiples?
+- Which artifacts get created — `doc/round-amount-plan.md` (architect), `scenarios/` entry (orchestrator), `doc/round-amount-analysis.md` (auto after final phase).
+
 ---
 
 ### Task 2C: CI Failure and Self-Healing
@@ -163,7 +177,9 @@ CI is failing after the last push. Fetch failure details with gh run view --log-
 Analyze the failure and fix it. All tests should be green.
 ```
 
-**Observe:** Does the agent read CI output? Does it identify the root cause without hints?
+**Observe:**
+- Does the agent read CI output? Does it identify the root cause without hints?
+- No new artifacts — the fix lands in existing `src/` files. The plan and analysis already exist from the original run.
 
 ---
 
