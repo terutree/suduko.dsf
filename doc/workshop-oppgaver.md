@@ -1,76 +1,76 @@
 # Workshop: Hands-on with Dark Software Factory
 
 **Time:** ~55 min  
-**Repo:** `dnb-compliance-dsf-run-en` (delt av fasilitator)  
+**Repo:** `dnb-compliance-dsf-run-en` (shared by facilitator)
 
 ---
 
-## Start Claude i Dark Mode
+## Start Claude in Dark Mode
 
-Kjør dette i rotmappen av repoet **før du starter oppgavene:**
+Run this in the root of the repo **before starting the tasks:**
 
 ```bash
 claude --dangerously-skip-permissions
 ```
 
-> `--dangerously-skip-permissions` lar agentene kjøre uten å spørre om tillatelse for hver operasjon. Nødvendig for autonom kjøring. Bruk kun i trygge, lokale miljøer.
+> `--dangerously-skip-permissions` lets agents run without asking for permission on each operation. Required for autonomous execution. Use only in safe, local environments.
 
 ```bash
-# Tail agent-log i eget vindu (valgfritt)
+# Tail agent log in a separate window (optional)
 tail -f .claude/logs/agent.log
 ```
 
 ---
 
-## Hva Factory-en Allerede Har Bygget
+## What the Factory Has Already Built
 
-Én komplett DSF-syklus er kjørt og dokumentert. Dette er referansen for hva du vil se under demoen.
+One complete DSF cycle has been run and documented. This is the reference for what you will see during the demo.
 
 ### Cycle 1: Transaction Compliance Service — Initial Build
 
-**Dato:** 2026-05-04 | **Agenter:** architect, 4× dev, 4× review, 4× test, 1× eval
+**Date:** 2026-05-04 | **Agents:** architect, 4× dev, 4× review, 4× test, 1× eval
 
-| Fase | Aktivitet | Tid |
-|------|-----------|-----|
-| Step 1 | Arkitektur og plan (4 faser) + 5 holdout-scenarioer | ~1 min 45s |
-| F1 | Domain-lag — typer, interfaces | ~2 min 16s |
-| F1 QC | Review + test (1 runde — APPROVED) | ~1 min |
-| F2 | 4 regler + pipeline + 22 unit-tester | ~3 min 12s |
-| F2 QC | Review + test (1 runde — APPROVED) | ~35s |
-| F3 | API-lag + middleware + 13 integrasjonstester | ~4 min 46s |
+| Phase | Activity | Time |
+|-------|----------|------|
+| Step 1 | Architecture and plan (4 phases) + 5 holdout scenarios | ~1 min 45s |
+| F1 | Domain layer — types, interfaces | ~2 min 16s |
+| F1 QC | Review + test (1 round — APPROVED) | ~1 min |
+| F2 | 4 rules + pipeline + 22 unit tests | ~3 min 12s |
+| F2 QC | Review + test (1 round — APPROVED) | ~35s |
+| F3 | API layer + middleware + 13 integration tests | ~4 min 46s |
 | F3 QC R1 | Review + test (CONDITIONAL APPROVAL) | ~1 min 5s |
-| F3 fix | Dev agent fikser net10→net8 + validering | ~14 min 26s |
+| F3 fix | Dev agent fixes net10→net8 + validation | ~14 min 26s |
 | F3 QC R2 | Review + test (APPROVED) | ~38s |
 | F4 | Dockerfile multi-stage + GitHub Actions | ~1 min 5s |
 | F4 QC R1 | Review + test (CONDITIONAL APPROVAL) | ~1 min 30s |
-| F4 fix | Dev agent legger til artifact upload | ~20s |
+| F4 fix | Dev agent adds artifact upload step | ~20s |
 | F4 QC R2 | Review + test (APPROVED) | ~35s |
 | Holdout | Eval agent → **5/5 (100%)** | ~1 min 10s |
 | **Total** | | **~35 min** |
 
-**Hva review-agentene fanget:**
+**What the review agents caught:**
 
-| Funn | Alvorlighet | Fase | Løst |
-|------|-------------|------|------|
-| Dev agent oppgraderte til `net10.0` (lokal SDK) — bryter net8-beslutning | Major | F3 | ✅ Fikset |
-| Null-validering manglet på `Sender`/`Receiver` — ga 500 i stedet for 400 | Major | F3 | ✅ Fikset |
-| `.trx`-resultater ikke lastet opp i CI — DORA audit-gap | Major | F4 | ✅ Fikset |
+| Finding | Severity | Phase | Resolved |
+|---------|----------|-------|----------|
+| Dev agent upgraded to `net10.0` (local SDK) — breaks net8 decision | Major | F3 | ✅ Fixed |
+| Null validation missing on `Sender`/`Receiver` — returned 500 instead of 400 | Major | F3 | ✅ Fixed |
+| `.trx` results not uploaded in CI — DORA audit gap | Major | F4 | ✅ Fixed |
 
-**Testresultater:**
-- 36/36 unit + integrasjonstester grønne
-- 5/5 holdout-scenarioer bestått (100%)
+**Test results:**
+- 36/36 unit + integration tests green
+- 5/5 holdout scenarios passed (100%)
 
-> **Nøkkelpunkt:** Alle tre major-funn ble fanget av review-agenten og fikset før holdout-evalueringen. Holdout kjørte mot et rent bygg.
+> **Key point:** All three major findings were caught by the review agent and fixed before holdout evaluation. Holdout ran against a clean build.
 
 ---
 
-## Track 1: Foundational — "AI legger til en regel for meg" (~45 min)
+## Track 1: Foundational — "AI adds a rule for me" (~45 min)
 
-**Mål:** Oppleve en komplett DSF-syklus. Gi agenten én veldefinert oppgave og følg med på hva som skjer.
+**Goal:** Experience a complete DSF cycle. Give the agent one well-specified task and follow what happens.
 
-### Task 1A: Valutabegrensning (anbefalt for alle)
+### Task 1A: Currency Restriction (recommended for everyone)
 
-Lim inn denne prompten direkte i Claude:
+Paste this prompt directly into Claude:
 
 ```
 Read CLAUDE.md.
@@ -86,18 +86,18 @@ Start with architect agent, create plan in doc/currency-restriction-plan.md.
 Implement phase by phase per the protocol in CLAUDE.md.
 ```
 
-**Se etter:**
-- Hvilke faser lager arkitekt-agenten?
-- Hvilke edge cases skriver dev-agenten tester for?
-- Hva finner review-agenten?
+**Watch for:**
+- Which phases does the architect agent create?
+- Which edge cases does the dev agent write tests for?
+- What does the review agent find?
 
-**Diskusjonsspørsmål etter kjøring:**
-- Måtte du korrigere agenten underveis?
-- Ville koden bestått code review i teamet ditt?
+**Discussion questions after run:**
+- Did you need to correct the agent along the way?
+- Would the code pass code review in your team?
 
 ---
 
-### Task 1B: Duplikat-sjekk (alternativ)
+### Task 1B: Duplicate Transaction Check (alternative)
 
 ```
 Read CLAUDE.md.
@@ -115,37 +115,37 @@ Implement phase by phase per the protocol in CLAUDE.md.
 
 ---
 
-## Track 2: Extended — "Jeg spesifiserer, AI leverer" (~55 min)
+## Track 2: Extended — "I specify, AI delivers" (~55 min)
 
-**Mål:** Skriv din egen spesifikasjon og observer hva som skjer når spec-en er vag vs. presis.
+**Goal:** Write your own specification and observe what happens when the spec is vague vs. precise.
 
-### Task 2A: Geografisk risikovurdering
+### Task 2A: Geographic Risk Assessment
 
-Du bestemmer detaljene — men prompten MÅ spesifisere:
-- Hvilke land er høyrisikoland?
-- Hvilken status produserer regelen?
-- Beløpsgrense eller alle beløp?
+You decide the details — but the prompt MUST specify:
+- Which countries are high risk?
+- What status does the rule produce?
+- Amount threshold or all amounts?
 - RuleName (snake_case)
 
-Startpunkt:
+Starting point:
 
 ```
 Read CLAUDE.md.
 New compliance rule: geo_risk_flag.
 
-[Fyll inn regellogikken selv — vær så presis som mulig]
+[Fill in the rule logic yourself — be as precise as possible]
 
 Start with architect agent, create plan in doc/geo-risk-plan.md.
 Implement phase by phase per the protocol in CLAUDE.md.
 ```
 
-> **Tips:** Start vagt med vilje i én kjøring, se hva agenten gjetter. Kjør igjen med presis spec. Sammenlign resultater.
+> **Tip:** Start vague on purpose for one run, see what the agent guesses. Run again with a precise spec. Compare the results.
 
 ---
 
-### Task 2B: Runde beløp (høyverdige runde beløp)
+### Task 2B: Round Amount Screening (high-value round amounts)
 
-Transaksjoner med "mistenkelig runde" beløp er et kjent AML-mønster.
+Transactions with "suspiciously round" amounts are a well-known AML pattern.
 
 ```
 Read CLAUDE.md.
@@ -165,30 +165,30 @@ Implement phase by phase per the protocol in CLAUDE.md.
 
 ---
 
-### Task 2C: CI-feil og selvhelbredelse
+### Task 2C: CI Failure and Self-Healing
 
-Kjør Track 1 eller 2A/2B til koden er ferdig. Introduser deretter en feil manuelt:
+Run Track 1 or 2A/2B until the code is finished. Then manually introduce a failure:
 
-1. Endre en terskelverdi i koden (ikke i tester)
-2. Push — CI feiler
-3. Gi Claude denne prompten:
+1. Change a threshold value in the code (not in tests)
+2. Push — CI fails
+3. Give Claude this prompt:
 
 ```
 CI is failing after the last push. Fetch failure details with gh run view --log-failed.
 Analyze the failure and fix it. All tests should be green.
 ```
 
-**Observer:** Leser agenten CI-output? Identifiserer den rotårsaken uten hint?
+**Observe:** Does the agent read CI output? Does it identify the root cause without hints?
 
 ---
 
-## Track 3: Factory — "Fasiten skrives FØR koden" (~55 min, ambisiøs)
+## Track 3: Factory — "The answer key is written BEFORE the code" (~55 min, ambitious)
 
-**Mål:** Opplev train/test-separasjonen i praksis. Skriv holdout-scenariet FØR implementasjonen.
+**Goal:** Experience the train/test separation in practice. Write the holdout scenario BEFORE implementation.
 
-### Steg 3.1: Skriv scenario manuelt (10 min)
+### Step 3.1: Write Scenario Manually (10 min)
 
-Velg én av reglene fra Track 2. Opprett scenariofilen FØR du gir implementasjonsoppgaven:
+Choose one of the rules from Track 2. Create the scenario file BEFORE giving the implementation task:
 
 ```markdown
 # scenarios/06-[rule-name]-yours.md
@@ -199,56 +199,56 @@ POST /api/v1/screen
 {
   "transactionId": "TEST-[RULE]-001",
   "sender": { "accountId": "ACC-SENDER-001", "name": "Test Sender", "country": "NO" },
-  "receiver": { "accountId": "ACC-RECEIVER-001", "name": "Test Receiver", "country": "[land]" },
-  "amount": [beløp i øre],
-  "currency": "[valuta]"
+  "receiver": { "accountId": "ACC-RECEIVER-001", "name": "Test Receiver", "country": "[country]" },
+  "amount": [amount in cents],
+  "currency": "[currency]"
 }
 
 **Expected status:** [Approved | Rejected | Flagged | PendingReview]
-**Active rule:** [regelnavn i snake_case]
-**Rationale:** [Forklar hvorfor dette scenariet skal gi forventet status]
+**Active rule:** [rule name in snake_case]
+**Rationale:** [Explain why this scenario should produce the expected status]
 ```
 
-### Steg 3.2: Implementer uten å vise scenario (20 min)
+### Step 3.2: Implement Without Showing Scenario (20 min)
 
-Start implementasjon med prompten fra Track 2. Dev-agenten ser aldri `scenarios/`.
+Start implementation with the prompt from Track 2. The dev agent never sees `scenarios/`.
 
-### Steg 3.3: Kjør holdout-evaluering (15 min)
+### Step 3.3: Run Holdout Evaluation (15 min)
 
 ```bash
 # Start API
 docker build -t compliance-api . && docker run -p 5000:8080 compliance-api
 
-# I Claude — ny prompt:
+# In Claude — new prompt:
 Read .claude/skills/eval/SKILL.md.
 Read the scenarios/ folder.
 API is running at http://localhost:5000.
 Evaluate all scenarios and report satisfaction score.
 ```
 
-**Diskusjonsspørsmål:**
-- Besto scenariet du skrev? Hvis ikke — hva manglet i spesifikasjonen?
-- Hva ville skjedd om agenten hadde sett fasiten?
+**Discussion questions:**
+- Did the scenario you wrote pass? If not — what was missing from the specification?
+- What would have happened if the agent had seen the answer key?
 
-### Steg 3.4 (bonus): Modifiser en skill og kjør ny regel
+### Step 3.4 (bonus): Modify a Skill and Run a New Rule
 
-Legg til et punkt i `.claude/skills/developer/SKILL.md`. Kjør en ny regel. Se om agenten følger det nye punktet automatisk.
+Add an item to `.claude/skills/developer/SKILL.md`. Run a new rule. See if the agent follows the new item automatically.
 
 ---
 
-## Fasilitatortips
+## Facilitator Tips
 
-**Vanlige problemer:**
+**Common problems:**
 
-| Problem | Løsning |
+| Problem | Solution |
 |---------|---------|
-| Agent skriver kode direkte (ikke via Task) | Påminn: "Du er orchestrator — dispatsch til agenter" |
-| CI feiler pga. formattering | `docker build --target test` lokalt før push |
-| Hooks blokkerer commit | Les feilmeldingen — den forklarer hva som mangler |
-| Agent gjentar seg selv | Gi den faktisk feiloutput, ikke bare "prøv igjen" |
+| Agent writes code directly (not via Task) | Remind: "You are the orchestrator — dispatch to agents" |
+| CI fails due to formatting | `docker build --target test` locally before push |
+| Hooks block commit | Read the error message — it explains what is missing |
+| Agent repeats itself | Give it the actual error output, not just "try again" |
 
-**Gode refleksjonsspørsmål til slutt:**
-- Hvilke oppgaver i teamet ditt ligner mest på dette?
-- Hva måtte du spesifisere mer presist enn du forventet?
-- Hva overrasket deg — positivt eller negativt?
-- Hvor ville du innført menneskelig review i en reell pipeline?
+**Good reflection questions at the end:**
+- Which tasks in your team most resemble this?
+- What did you need to specify more precisely than you expected?
+- What surprised you — positively or negatively?
+- Where would you introduce human review in a real pipeline?
