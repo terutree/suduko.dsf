@@ -30,7 +30,9 @@ public static class ScreeningEndpoints
                 ?? throw new InvalidOperationException("RequestId middleware not registered");
             var response = await pipeline.ScreenAsync(requestId, request, ct);
             return Results.Ok(response);
-        });
+        })
+        .WithName("ScreenTransaction")
+        .WithOpenApi();
 
         app.MapGet("/api/v1/screen/{requestId}", async (
             string requestId,
@@ -39,7 +41,9 @@ public static class ScreeningEndpoints
         {
             var result = await store.GetAsync(requestId, ct);
             return result is null ? Results.NotFound() : Results.Ok(result);
-        });
+        })
+        .WithName("GetScreeningResult")
+        .WithOpenApi();
 
         return app;
     }

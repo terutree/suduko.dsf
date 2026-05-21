@@ -11,6 +11,12 @@ using TransactionCompliance.Infrastructure.Stores;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Transaction Compliance API", Version = "v1" });
+});
+
 // JSON enum serialization — returns "Approved" not 0
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -42,6 +48,13 @@ if (!app.Environment.IsDevelopment())
         ctx.Response.StatusCode = 500;
         await ctx.Response.WriteAsJsonAsync(new { error = "An unexpected error occurred." });
     }));
+}
+
+// Swagger — dev only, after exception handler
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction Compliance API v1"));
 }
 
 // X-Request-Id middleware — must be before endpoints
