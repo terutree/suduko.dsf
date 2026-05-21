@@ -21,7 +21,13 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-// Register compliance rules (multiple registration pattern — ALL 4 rules)
+// Infrastructure — TimeProvider and duplicate-transaction store
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<ITransactionSeenStore, InMemoryTransactionSeenStore>();
+
+// Register compliance rules (multiple registration pattern — ALL rules)
+// DuplicateTransactionRule MUST be first so duplicate detection short-circuits before other rules record state
+builder.Services.AddSingleton<IScreeningRule, DuplicateTransactionRule>();
 builder.Services.AddSingleton<IScreeningRule, AmountThresholdRule>();
 builder.Services.AddSingleton<IScreeningRule>(_ =>
     new SanctionedCountryRule(CountryLists.SanctionedCountries));
@@ -30,7 +36,7 @@ builder.Services.AddSingleton<IScreeningRule, PepCheckRule>();
 builder.Services.AddSingleton<IScreeningRule>(_ =>
     new CurrencyRestrictionRule(new[] { "NOK", "EUR", "USD", "GBP" }));
 
-// Infrastructure — in-memory implementations
+// Infrastructure — remaining in-memory implementations
 builder.Services.AddSingleton<IScreeningResultStore, InMemoryScreeningResultStore>();
 builder.Services.AddSingleton<IDailyAggregateStore, InMemoryDailyAggregateStore>();
 builder.Services.AddSingleton<IPepService, InMemoryPepService>();

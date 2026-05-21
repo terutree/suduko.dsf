@@ -17,26 +17,29 @@ public sealed class InMemoryTransactionSeenStore : ITransactionSeenStore
 
     public Task<bool> TryRecordAsync(string transactionId, DateTimeOffset seenAt, CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
+
         var now = _timeProvider.GetUtcNow();
+        var seenAtUtc = seenAt.ToUniversalTime();
 
-        var isDuplicate = false;
+        if (_store.TryAdd(transactionId, seenAtUtc))
+            return Task.FromResult(true); // new entry
 
-        _store.AddOrUpdate(
-            transactionId,
-            addValueFactory: _ => seenAt.ToUniversalTime(),
-            updateValueFactory: (_, existing) =>
-            {
-                var age = now - existing;
-                if (age < DuplicateWindow)
-                {
-                    isDuplicate = true;
-                    return existing;
-                }
+        // Key exists — check if the existing entry is within the duplicate window
+        var existing = _store[transactionId];
+        var age = now - existing;
+        if (age < DuplicateWindow)
+            return Task.FromResult(false); // duplicate
 
-                // Expired entry — replace with new timestamp
-                return seenAt.ToUniversalTime();
-            });
-
-        return Task.FromResult(!isDuplicate);
+        // Expired — atomically remove the specific expired entry, then add the fresh one.
+        // TryRemove(KeyValuePair) only removes if both key AND value match, preventing
+        // a race where two threads both see the expired entry and both return true.
+        if (_store.TryRemove(new KeyValuePair<string, DateTimeOffset>(transactionId, existing)))
+        {
+            _store.TryAdd(transactionId, seenAtUtc);
+            return Task.FromResult(true);
+        }
+        // Lost the race — another thread already refreshed the entry; treat as duplicate (conservative, safe).
+        return Task.FromResult(false);
     }
 }
