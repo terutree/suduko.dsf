@@ -16,6 +16,7 @@ Detailed rule logic with thresholds, pipeline mapping, and checklist: **`doc/dom
 | `sanctioned_country` | `Rejected` | KP/IR/SY/CU/RU |
 | `cumulative_daily_limit` | `Flagged` | > 500,000 NOK/day per sender |
 | `pep_check` | `PendingReview` | PEP + > 50,000 NOK |
+| `currency_restriction` | `Rejected` | Only NOK/EUR/USD/GBP permitted |
 
 All amounts are handled as `long` (cents/øre) — never `decimal`.
 

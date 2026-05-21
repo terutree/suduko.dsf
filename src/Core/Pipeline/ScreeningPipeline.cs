@@ -80,6 +80,7 @@ public sealed class ScreeningPipeline : IScreeningPipeline
             switch (r.Rule)
             {
                 case "sanctioned_country":
+                case "currency_restriction":
                     hasRejected = true;
                     break;
                 case "pep_check":

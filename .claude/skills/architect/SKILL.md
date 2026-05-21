@@ -105,6 +105,7 @@ The dev agent never sees this file (`.claudeignore`).
 - **Rule names are snake_case** — always specify the exact `RuleName` in the plan: `velocity_check`, `amount_threshold`, etc.
 - **No alternative analyses** unless the choice is genuinely difficult
 - **Cumulative limit — holdout scenario design:** `cumulative_daily_limit` can only be tested in isolation with single amounts < 10,000,000 cents (100,000 NOK). With 2 transactions the 50M limit cannot be reached without triggering `amount_threshold`. Use 6+ transactions of 9,000,000 cents in the holdout scenario.
+- **Named constants for rule lists**: permitted values (country lists, currency lists) must be planned in a static constants class (e.g. `CountryLists`, `CurrencyLists`) — not inline array literals in `Program.cs`. Plan must include the constants class in the file list.
 - **`IScreeningPipeline.ScreenAsync` takes `requestId: string` parameter:** Pipeline NEVER generates `Guid.NewGuid()` internally. The spec holdout endpoint fetches requestId from X-Request-Id middleware and passes it to the pipeline.
 - **API endpoint acceptance criteria must include composite null validation:** For any POST endpoint phase, add acceptance criterion: "null/missing Sender, Receiver, and Currency return 400 (not 500)." Dev agents skip this without an explicit criterion.
 - **CI phase acceptance criteria must include artifact upload:** For the Dockerfile/CI phase, add acceptance criterion: "CI uploads test results as artifact with `if: always()`." Without this, the artifact upload step is regularly omitted.

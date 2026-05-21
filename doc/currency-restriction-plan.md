@@ -43,7 +43,13 @@ F2 depends on F1.
 ## Implementation Plan
 
 ### F1: Rule implementation, pipeline mapping, and DI registration
-**QC-status:** NOT STARTED
+**QC-status:** APPROVED
+**Review:** APPROVED — 2 minor findings (both Minor)
+| # | Severity | File | Description |
+|---|----------|------|-------------|
+| 1 | Mi | Program.cs | Inline `new[] { "NOK", ... }` — no named constant |
+| 2 | Mi | CurrencyRestrictionRule.cs | Empty string treated as non-permitted (acceptable — API layer responsibility) |
+**Test:** PASSED — 36/36 (Core.Tests 23/23, Api.Tests 13/13), 0 regressions. Smoke: NOK→Approved ✓, JPY→Rejected ✓
 **Delivers:** `CurrencyRestrictionRule`, updated `ScreeningPipeline.DetermineStatus`, DI wiring in `Program.cs`
 
 **Files:**
@@ -62,7 +68,9 @@ F2 depends on F1.
 ---
 
 ### F2: Unit tests and integration tests
-**QC-status:** NOT STARTED
+**QC-status:** APPROVED
+**Review:** APPROVED (after 2 fix rounds — 4 original findings resolved + 1 new minor introduced and fixed)
+**Test:** PASSED — 50/50 (Core.Tests 31/31, Api.Tests 19/19), 0 regressions
 **Delivers:** Full test coverage for `CurrencyRestrictionRule` and end-to-end via `WebApplicationFactory`
 
 **Files:**
@@ -77,6 +85,14 @@ F2 depends on F1.
 - [ ] Integration test: POST `/api/v1/screen` with `Currency: "NOK"` → `currency_restriction` passes (status not Rejected from this rule alone)
 - [ ] Integration test: null or empty `Currency` → response includes `currency_restriction` triggered (non-permitted)
 - [ ] `docker build --target test` green
+
+---
+
+## Holdout Evaluation
+
+**Score:** 15/15 (100%) — APPROVED  
+**Date:** 2026-05-21  
+All rules (amount_threshold, sanctioned_country, cumulative_daily_limit, pep_check, currency_restriction) passed across all 6 scenario files including boundary, trigger, and combined cases.
 
 ---
 

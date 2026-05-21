@@ -79,6 +79,9 @@ Review and test agents are run in parallel by the orchestrator BEFORE the next p
 - [ ] **Mock PEP service**: use `IServiceCollection.AddSingleton<IPepService, FakePepService>()` in test factory
 - [ ] **`InMemoryPepService` contains `ACC-PEP-001`**: always include this account for holdout compatibility
 - [ ] **Unique sender accounts per integration test**: use isolated `senderAccount` IDs in `ScreeningEndpointTests` to avoid state bleed from Singleton stores (daily limit, velocity)
+- [ ] **No Fact/Theory duplication**: if a `[Theory]` already covers a case (e.g. rule name in `permitted_currency_passes`), do NOT add a standalone `[Fact]` for the same assertion — the Theory is sufficient
+- [ ] **Integration tests assert full triggered rule fields**: use `.Single(r => r.Rule == "...")` then assert `Status`, `Severity`, and `Message` — not just `Rule` and `Status`
+- [ ] **Permitted-list rules: Theory covers all list members at integration level**: for any rule with an explicit allow-list, write a `[Theory]` covering every allowed value — not just one representative
 - [ ] **Core.Tests NEVER references Infrastructure**: use inline `FakePepService` in the test file — not `InMemoryPepService` from Infrastructure. Remove the Infrastructure project reference from Core.Tests.csproj.
 
 ## Checklist: ASP.NET Core

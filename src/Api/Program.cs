@@ -21,6 +21,8 @@ builder.Services.AddSingleton<IScreeningRule>(_ =>
     new SanctionedCountryRule(CountryLists.SanctionedCountries));
 builder.Services.AddSingleton<IScreeningRule, CumulativeDailyLimitRule>();
 builder.Services.AddSingleton<IScreeningRule, PepCheckRule>();
+builder.Services.AddSingleton<IScreeningRule>(_ =>
+    new CurrencyRestrictionRule(new[] { "NOK", "EUR", "USD", "GBP" }));
 
 // Infrastructure — in-memory implementations
 builder.Services.AddSingleton<IScreeningResultStore, InMemoryScreeningResultStore>();

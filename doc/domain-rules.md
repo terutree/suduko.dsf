@@ -75,6 +75,24 @@ PEP service always behind `IPepService` interface. `InMemoryPepService` includes
 
 ---
 
+### currency_restriction
+
+**Status:** Active  
+**RuleName:** `currency_restriction`  
+**ScreeningStatus on match:** `Rejected`  
+**Severity:** `High`
+
+Only NOK, EUR, USD, and GBP are permitted currencies. Transactions in any other currency are rejected.
+
+```
+Currency ∉ { NOK, EUR, USD, GBP } → Rejected, severity High
+```
+
+Comparison: case-insensitive (`OrdinalIgnoreCase`). Null/empty currency is treated as non-permitted → Rejected.  
+Allowed list is a constructor parameter in `CurrencyRestrictionRule` — injected from `Program.cs`.
+
+---
+
 ## Pipeline Status Mapping
 
 Strictest status wins when multiple rules trigger:
@@ -86,6 +104,7 @@ Rejected > PendingReview > Flagged > Approved
 | Rule | Status on match |
 |-------|-----------------|
 | `sanctioned_country` | `Rejected` |
+| `currency_restriction` | `Rejected` |
 | `pep_check` | `PendingReview` |
 | `amount_threshold` | `Flagged` |
 | `cumulative_daily_limit` | `Flagged` |
