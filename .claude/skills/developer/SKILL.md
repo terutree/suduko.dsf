@@ -58,6 +58,7 @@ Review and test agents are run in parallel by the orchestrator BEFORE the next p
 - [ ] **Request-ID propagated**: `RequestId` in ScreeningResponse MUST come from X-Request-Id middleware — never `Guid.NewGuid()` in pipeline. `IScreeningPipeline.ScreenAsync` takes a `requestId: string` parameter; the endpoint fetches the value from `ctx.Items["RequestId"]`.
 - [ ] **JSON enum serialization**: `ConfigureHttpJsonOptions` with `JsonStringEnumConverter` MUST be configured — API returns `"Approved"` not `0`. Add: `builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));`
 - [ ] **Error messages to client**: generic messages — never stack traces, internal field names, or DB details
+- [ ] **`ConcurrentDictionary` expiry pattern**: when implementing a time-windowed cache with expiry, the `AddOrUpdate` factory with a captured mutable variable is fragile — the factory can be retried by the CAS loop. Use `TryAdd` for the fast path, then `TryRemove(KeyValuePair<K,V>)` for atomic compare-and-delete on the expiry branch. Never use a closed-over `bool` to communicate the result of a factory.
 
 ## Checklist: Domain Logic
 
@@ -83,6 +84,7 @@ Review and test agents are run in parallel by the orchestrator BEFORE the next p
 - [ ] **Integration tests assert full triggered rule fields**: use `.Single(r => r.Rule == "...")` then assert `Status`, `Severity`, and `Message` — not just `Rule` and `Status`
 - [ ] **Permitted-list rules: Theory covers all list members at integration level**: for any rule with an explicit allow-list, write a `[Theory]` covering every allowed value — not just one representative
 - [ ] **Core.Tests NEVER references Infrastructure**: use inline `FakePepService` in the test file — not `InMemoryPepService` from Infrastructure. Remove the Infrastructure project reference from Core.Tests.csproj.
+- [ ] **No standalone sub-assertion test**: if a `[Fact]` asserts only a subset of what an existing test already asserts (e.g., `requestId` uniqueness already checked at the end of a duplicate-detection test), remove the standalone test — it adds noise without coverage.
 
 ## Checklist: ASP.NET Core
 

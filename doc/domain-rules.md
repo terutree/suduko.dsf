@@ -93,6 +93,27 @@ Allowed list is a constructor parameter in `CurrencyRestrictionRule` — injecte
 
 ---
 
+### duplicate_transaction
+
+**Status:** Active  
+**RuleName:** `duplicate_transaction`  
+**ScreeningStatus on match:** `Rejected`  
+**Severity:** `High`
+
+The same `TransactionId` cannot be screened more than once within 24 hours. A second submission of an identical `TransactionId` within the window is rejected immediately.
+
+```
+TransactionId seen within past 24 h → Rejected, severity High
+```
+
+Deduplication window: exactly 24 hours from the first submission timestamp (UTC).  
+An expired entry (> 24 h old) is replaced — the transaction is treated as new.  
+Store: `ITransactionSeenStore` backed by `InMemoryTransactionSeenStore`.  
+Clock: `TimeProvider` injected — deterministic in tests.  
+Rule ordering: registered first in the pipeline (fail-fast before other rules record state).
+
+---
+
 ## Pipeline Status Mapping
 
 Strictest status wins when multiple rules trigger:
@@ -106,6 +127,7 @@ Rejected > PendingReview > Flagged > Approved
 | `sanctioned_country` | `Rejected` |
 | `currency_restriction` | `Rejected` |
 | `pep_check` | `PendingReview` |
+| `duplicate_transaction` | `Rejected` |
 | `amount_threshold` | `Flagged` |
 | `cumulative_daily_limit` | `Flagged` |
 
