@@ -88,3 +88,13 @@ Built end-to-end by AI agents using the [Dark Software Factory](https://hackerno
 | F2 | Board UI, cell input, keyboard/mobile interaction |
 | F3 | Timer, localStorage persistence, undo |
 | F4 | Polish, dark mode, Docker setup |
+
+---
+
+## References
+
+| Resource | Content |
+|---------|---------|
+| [The Dark Factory Pattern (HackerNoon)](https://hackernoon.com/the-dark-factory-pattern-moving-from-ai-assisted-to-fully-autonomous-coding) | Holdout scenarios, satisfaction metrics, agent protocol |
+| [StrongDM Software Factory](https://simonwillison.net/2026/Feb/7/software-factory/) | Zero human review, the `return true` problem |
+| [Anthropic: Agentic Coding Trends 2026](https://resources.anthropic.com/hubfs/2026%20Agentic%20Coding%20Trends%20Report.pdf) | Industry data and maturity trends |
