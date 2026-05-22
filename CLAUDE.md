@@ -1,80 +1,393 @@
-# CLAUDE.md — Transaction Compliance Service
+# CLAUDE.md — [Project Name]
 
 ## Product
 
-**Transaction Compliance Service** — a REST API that screens transactions against compliance rules (amount thresholds, sanctions lists, PEP checks, geographic restrictions) and logs all decisions for audit.
+**Sudoku SPA** — [one-sentence description of what this service/app does].
 
-Typical DNB Liv task: well-defined rule logic, requires precision and full traceability. DORA and Solvency II relevant.
+Typical task: a single page website that lets me play sudoku? include an approtiate tech stack that utilizes docker
 
-### Compliance Rules
 
-Detailed rule logic with thresholds, pipeline mapping, and checklist: **`doc/domain-rules.md`**
+### Domain Overview
 
-| RuleName | ScreeningStatus | Short description |
-|----------|----------------|-------------|
-| `amount_threshold` | `Flagged` | > 100,000 NOK |
-| `sanctioned_country` | `Rejected` | KP/IR/SY/CU/RU |
-| `cumulative_daily_limit` | `Flagged` | > 500,000 NOK/day per sender |
-| `pep_check` | `PendingReview` | PEP + > 50,000 NOK |
-| `currency_restriction` | `Rejected` | Only NOK/EUR/USD/GBP permitted |
-| `duplicate_transaction` | `Rejected` | Same TransactionId within 24 h |
 
-All amounts are handled as `long` (cents/øre) — never `decimal`.
+ — Technical Specification
+Overview
+A responsive single-page web application (SPA) that allows users to:
 
-### API Contract
+Play Sudoku puzzles in-browser
 
-```csharp
-// POST /api/v1/screen
-record ScreeningRequest(
-    string TransactionId,
-    PartyInfo Sender,
-    PartyInfo Receiver,
-    long Amount,       // cents/øre
-    string Currency,   // ISO 4217
-    string? Description = null
-);
+Select difficulty levels
 
-record PartyInfo(string AccountId, string Name, string Country); // ISO 3166-1 alpha-2
+Validate entries in real time
 
-// Response
-record ScreeningResponse(
-    string RequestId,
-    string TransactionId,
-    ScreeningStatus Status,      // Approved | Rejected | Flagged | PendingReview
-    DateTimeOffset Timestamp,
-    IReadOnlyList<RuleResult> Rules
-);
+Track elapsed time
 
-record RuleResult(string Rule, RuleStatus Status, RuleSeverity Severity, string Message);
+Save and resume progress
 
-// GET /api/v1/screen/{requestId}  — retrieve previous result
-// GET /health                      — health check
-```
+Generate new puzzles
 
----
+Toggle notes/pencil mode
+
+Support keyboard and mobile interaction
+
+The application should be lightweight, containerized with Docker, and easy to run locally or deploy to cloud infrastructure.
+
+Goals
+Functional Goals
+Render a 9x9 Sudoku board
+
+Generate valid Sudoku puzzles
+
+Support multiple difficulty levels:
+
+Easy
+
+Medium
+
+Hard
+
+Expert
+
+Allow:
+
+Number entry
+
+Pencil marks
+
+Erasing
+
+Undo/redo
+
+Detect:
+
+Invalid moves
+
+Puzzle completion
+
+Persist game state locally
+
+Non-Functional Goals
+Fast initial load
+
+Mobile responsive
+
+Accessible keyboard navigation
+
+
+Technology	Purpose
+Node.js	Runtime
+Express	API server
+PostgreSQL	Persistence
+Prisma	ORM
+Architecture
+Browser
+   │
+   ▼
+React SPA
+   │
+   ├── Sudoku Engine
+   ├── State Store
+   ├── Timer System
+   ├── Validation Engine
+   └── Persistence Layer
+Optional backend:
+
+React SPA
+   │
+REST API
+   │
+Node/Express
+   │
+PostgreSQL
+Core Features
+1. Game Board
+Requirements
+9x9 responsive grid
+
+Highlight:
+
+Selected cell
+
+Matching numbers
+
+Row/column
+
+Invalid cells
+
+Immutable starting clues
+
+Interaction
+Input	Action
+Click cell	Select
+Keyboard 1-9	Enter number
+Backspace/Delete	Clear
+Arrow keys	Navigate
+Long press/mobile	Notes mode
+2. Sudoku Generator
+Requirements
+Generate valid solvable puzzles
+
+Ensure unique solution
+
+Difficulty scaling
+
+Suggested Strategy
+Generate solved board
+
+Remove cells strategically
+
+Validate uniqueness using solver
+
+Difficulty Tuning
+Difficulty	Approximate Clues
+Easy	36–45
+Medium	32–35
+Hard	28–31
+Expert	22–27
+Data Model
+Cell Structure
+type Cell = {
+  value: number | null
+  notes: number[]
+  fixed: boolean
+  invalid: boolean
+}
+Board Structure
+type Board = Cell[][]
+State Management
+Global State
+type GameState = {
+  board: Board
+  selectedCell: [number, number] | null
+  difficulty: Difficulty
+  elapsedTime: number
+  notesMode: boolean
+  history: Board[]
+}
+Validation Rules
+Real-Time Validation
+Duplicate number detection:
+
+Row
+
+Column
+
+3x3 region
+
+Win Detection
+Puzzle is complete when:
+
+All cells filled
+
+No invalid states
+
+Matches solved board
+
+Persistence
+Local Storage
+Save:
+
+Current board
+
+Timer
+
+Notes
+
+Difficulty
+
+History stack
+
+Autosave
+Every move
+
+On page unload
+
+UI Components
+Components
+Component	Responsibility
+GameBoard	Render Sudoku grid
+Cell	Individual square
+Toolbar	Controls
+Timer	Elapsed time
+DifficultySelect	New game difficulty
+NumberPad	Mobile input
+Modal	Win/game dialogs
+Styling
+Design Requirements
+Minimalist interface
+
+Dark/light mode
+
+Smooth transitions
+
+Mobile-first responsive layout
+
+Tailwind Guidelines
+Use utility-first classes with:
+
+CSS variables for themes
+
+Grid layout for board
+
+Flex layouts for controls
+
+Accessibility
+Requirements
+Keyboard navigable
+
+ARIA labels for cells
+
+High contrast mode support
+
+Screen-reader-friendly controls
+
+Performance Targets
+Metric	Goal
+First load	< 2s
+Lighthouse score	90+
+Bundle size	< 300KB gzipped
+Docker Setup
+Project Structure
+sudoku-app/
+├── client/
+├── server/          # optional
+├── docker/
+├── docker-compose.yml
+└── README.md
+Frontend Dockerfile
+FROM node:22-alpine
+
+
+services:
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+
+  server:
+    build: ./server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+Development Workflow
+Local Development
+docker compose up
+Frontend:
+
+http://localhost:5173
+Backend:
+
+http://localhost:3000
+Testing Strategy
+Unit Tests
+Area	Tool
+Sudoku logic	Vitest
+Components	React Testing Library
+E2E Tests
+Tool	Purpose
+Playwright	Full gameplay testing
+Deployment Options
+Recommended
+Platform	Notes
+Vercel	Frontend deployment
+Fly.io	Full-stack Docker deployment
+Railway	Simple container hosting
+Future Enhancements
+Potential Features
+Multiplayer races
+
+Daily challenge mode
+
+Leaderboards
+
+User accounts
+
+Hint engine
+
+AI-generated difficulty balancing
+
+Progressive Web App support
+
+Statistics dashboard
+
+Security Considerations
+Validate all backend input
+
+Rate limit API endpoints
+
+Sanitize persisted data
+
+Avoid exposing solved boards unnecessarily
+
+Suggested Milestones
+Phase 1
+Basic board rendering
+
+Number input
+
+Validation
+
+Phase 2
+Puzzle generation
+
+Difficulty levels
+
+Timer
+
+Phase 3
+Persistence
+
+Notes mode
+
+Undo/redo
+
+Phase 4
+Docker deployment
+
+Testing
+
+Accessibility improvements
+
+Success Criteria
+The application is considered complete when:
+
+Users can fully play Sudoku on desktop/mobile
+
+Puzzle generation is reliable
+
+Progress persists across refreshes
+
+Dockerized setup works with one command
+
+Lighthouse accessibility/performance targets are met
+
 
 ## Stack
 
-| Component | Choice |
-|-----------|------|
-| Runtime | .NET 8, ASP.NET Core |
-| API style | Minimal API (IEndpointRouteBuilder extensions) |
-| Language | C# 12, nullable reference types enabled |
-| Solution structure | `src/Api`, `src/Core`, `src/Infrastructure`, `tests/Api.Tests`, `tests/Core.Tests` |
-| Testing | xUnit + FluentAssertions + WebApplicationFactory |
-| Screening rule pattern | `IScreeningRule` pipeline — rules registered in DI |
-| Traceability | Request-ID middleware (X-Request-Id header) |
-| Audit logging | `ILogger<T>` — all decisions (approved/rejected/flagged) |
-| CI/CD | GitHub Actions (dotnet build + test + format) |
-| PEP service | Mock via interface (HttpClient-based production impl. omitted) |
+Offline-capable (optional PWA support)
+
+Dockerized development and deployment workflow
+Frontend
+Technology	Purpose
+React + TypeScript	SPA framework
+Vite	Fast development/build tooling
+Zustand	Lightweight state management
+Tailwind CSS	Styling
+React Hook Form	Optional form handling
+Framer Motion	UI animations
+LocalStorage API	Save game progress
+Backend (Optional)
+A backend is optional because Sudoku logic can run fully client-side.
 
 ### Established Decisions (do not reopen)
 
-- Amounts always `long` (cents/øre) — no `decimal`, no `double`
-- All API responses: `{ requestId, transactionId, status, timestamp, rules[] }`
-- All success status codes: 200 OK (not 201 for screening — it is a query, not a resource creation)
-- `IScreeningRule` is the contract — new rules are added without modifying the pipeline
-- PEP service is always behind an interface — never direct HttpClient calls from the rule
+<!-- Document architectural decisions that are settled. -->
+<!-- Example: "All amounts as long (cents) — never decimal" -->
 
 ---
 
@@ -102,7 +415,7 @@ CLAUDE.md is index and protocol — not complete domain documentation. As it gro
 |--------|--------|
 | CLAUDE.md > 200 lines | Split according to the table below |
 | Same detail found in CLAUDE.md and a skill | Move to skill, point from CLAUDE.md |
-| New rule overview with > 5 rules | Move to `doc/domain-rules.md` |
+| New domain rule overview with > 5 rules | Move to `doc/domain-rules.md` |
 | New subsystem with its own responsibility | Create `src/[module]/CLAUDE.md` |
 
 ### What belongs where
@@ -110,8 +423,8 @@ CLAUDE.md is index and protocol — not complete domain documentation. As it gro
 | Content | Location |
 |---------|-----------|
 | Protocol, established decisions, architecture map | `CLAUDE.md` (root) |
-| Compliance rules with thresholds and logic | `doc/domain-rules.md` |
-| C# checklists, build environment, test patterns | `.claude/skills/developer/SKILL.md` |
+| Domain rules with thresholds and logic | `doc/domain-rules.md` |
+| Build environment, test patterns, language checklists | `.claude/skills/developer/SKILL.md` |
 | Architecture principles, phase format | `.claude/skills/architect/SKILL.md` |
 | Domain logic per layer | `src/Core/CLAUDE.md`, `src/Api/CLAUDE.md` |
 
@@ -121,27 +434,10 @@ Claude Code reads CLAUDE.md in all parent directories + current directory. Use t
 
 ```
 CLAUDE.md                    ← protocol, established decisions (index)
-src/Core/CLAUDE.md           ← IScreeningRule contract, domain rules
-src/Api/CLAUDE.md            ← Minimal API conventions, middleware
-src/Infrastructure/CLAUDE.md ← PEP mock, CountryLists, external dependencies
+src/Core/CLAUDE.md           ← core domain contracts
+src/Api/CLAUDE.md            ← API conventions, middleware
+src/Infrastructure/CLAUDE.md ← external dependencies
 ```
-
-### New Rule — Update Order
-
-Order is mandatory when adding a new compliance rule:
-
-```
-1. Feature description (prompt to orchestrator) — specify full rule logic here
-2. Architect agent creates plan
-3. Developer agent implements
-4. After approved implementation:
-   a. Add to doc/domain-rules.md (detailed logic)
-   b. Add to CLAUDE.md rule overview (one line)
-   c. Add scenario to scenarios/ (holdout)
-5. Commit includes all three files
-```
-
-CLAUDE.md never receives detailed rule logic — only a table row and a pointer.
 
 ---
 
@@ -152,19 +448,19 @@ The `scenarios/` folder contains acceptance criteria written as plain-text HTTP 
 **The dev agent NEVER sees `scenarios/`** (`.claudeignore`). Same principle as train/test split in ML: the agent writing the code cannot read the answer key it is evaluated against. StrongDM discovered that agents who can see the tests write code that games them — including `return true`.
 
 **The eval agent** is a separate agent that:
-- Receives the URL to the running API + content from `scenarios/`
+- Receives the URL to the running service + content from `scenarios/`
 - Never sees the source code
 - Reports a **satisfaction score**: number of scenarios passing / total
 
 ### Running Holdout Evaluation
 
 ```bash
-# Start API locally
-docker build -t compliance-api . && docker run -p 5000:8080 compliance-api
+# Start service locally
+# [add your run command here]
 
 # In a new terminal — dispatch eval agent
 # Read .claude/skills/eval/SKILL.md
-# Task(eval-agent, "Read scenarios/ and evaluate against http://localhost:5000")
+# Task(eval-agent, "Read scenarios/ and evaluate against http://localhost:[port]")
 ```
 
 The eval agent blocks the pipeline at < 80% satisfaction.
@@ -186,8 +482,6 @@ gh run view --log-failed
 # "CI failing on branch [branch]. Output: [paste error]. Analyze and fix."
 ```
 
-The GitHub Actions pipeline posts a failure summary as a PR comment on failure — copy and paste to the dev agent.
-
 ---
 
 ## Agent Protocol
@@ -202,7 +496,7 @@ Task(architect-agent, feature description + existing code structure)
 Save plan in doc/[feature]-plan.md
 Evaluate: Are the phases properly scoped (3-5)? Is the dependency graph correct?
 
-For features that introduce a new compliance rule:
+For features that introduce a new domain rule:
   Verify that the plan contains ## Holdout-scenario with filename and content.
   The orchestrator writes the scenario file directly (Write tool) based on the plan spec.
   The orchestrator is not subject to .claudeignore — Task agents are.
@@ -258,7 +552,7 @@ No human approval of plan. The orchestrator decides itself.
 #### Step 3: Holdout Evaluation (after final phase)
 
 ```
-Task(eval-agent, .claude/skills/eval/SKILL.md + "API running at http://localhost:5000")
+Task(eval-agent, .claude/skills/eval/SKILL.md + "Service running at http://localhost:[port]")
 Satisfaction ≥ 80% → proceed to Step 4
 Satisfaction < 80% → Task(dev-agent, fix scenario failures) → run eval again
 ```
@@ -266,7 +560,7 @@ Satisfaction < 80% → Task(dev-agent, fix scenario failures) → run eval again
 #### Step 4: Integration and Commit
 
 ```
-docker build --target test -t compliance-test . — all phases green
+[add your build/test command here] — all phases green
 Update plan with final status
 Theme-based commits — one commit per logical theme
 ```
@@ -340,33 +634,14 @@ Hook blocks because APPROVED + CONDITIONAL APPROVAL in Review line
 
 ## Commands
 
-Everything runs via Docker — no local dotnet installation required.
-
 ```bash
-# Build + test (all projects)
-docker build --target test -t compliance-test .
+# Build + test
+# [add your build command here]
 
-# Run API locally
-docker build -t compliance-api .
-docker run -p 5000:8080 compliance-api
-# API available at http://localhost:5000
+# Run locally
+# [add your run command here]
 
 # CI status
 gh run list --limit 5
 gh run view --log-failed
-```
-
----
-
-## Sanctions List (demo data)
-
-```csharp
-public static class CountryLists
-{
-    public static readonly string[] SanctionedCountries =
-        ["KP", "IR", "SY", "CU", "RU"];
-
-    public static readonly string[] HighRiskCountries =
-        [..SanctionedCountries, "AF", "IQ", "LY", "YE", "SO"];
-}
 ```
